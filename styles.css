@@ -72,8 +72,7 @@ img {
   border-bottom: 1px solid var(--line);
 }
 
-.topline a:hover,
-.nav-links a:hover {
+.topline a:hover {
   color: var(--accent);
 }
 
@@ -123,6 +122,47 @@ img {
   font-size: 13px;
   font-weight: 700;
   text-transform: uppercase;
+}
+
+.nav-links a,
+.mobile-menu-links a {
+  position: relative;
+}
+
+.nav-links a::after,
+.mobile-menu-links a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -8px;
+  height: 2px;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.2s ease;
+}
+
+.nav-links a:hover,
+.nav-links a:focus-visible,
+.nav-links a[aria-current="page"],
+.mobile-menu-links a:hover,
+.mobile-menu-links a:focus-visible,
+.mobile-menu-links a[aria-current="page"] {
+  color: var(--accent);
+  text-decoration-line: underline;
+  text-decoration-color: var(--accent);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 8px;
+}
+
+.nav-links a:hover::after,
+.nav-links a:focus-visible::after,
+.nav-links a[aria-current="page"]::after,
+.mobile-menu-links a:hover::after,
+.mobile-menu-links a:focus-visible::after,
+.mobile-menu-links a[aria-current="page"]::after {
+  transform: scaleX(1);
 }
 
 .menu-toggle,
@@ -577,8 +617,10 @@ h3 {
     text-transform: uppercase;
   }
 
-  .mobile-menu-links a:hover {
-    color: var(--accent);
+  .mobile-menu-links a::after {
+    right: auto;
+    bottom: 0;
+    width: 68px;
   }
 
   .mobile-menu-contacts {

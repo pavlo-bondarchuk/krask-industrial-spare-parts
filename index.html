@@ -265,7 +265,22 @@
       const siteHeader = document.querySelector(".site-header");
       const menuToggle = document.querySelector(".menu-toggle");
       const mobileMenu = document.querySelector("#mobile-menu");
+      const navItems = Array.from(document.querySelectorAll('a[href^="#"]'));
+      const trackedSections = Array.from(
+        document.querySelectorAll("#about, #products, #contacts"),
+      );
       let lockedScrollY = 0;
+
+      const setActiveNavigation = (id) => {
+        navItems.forEach((item) => {
+          const isActive = item.getAttribute("href") === `#${id}`;
+          if (isActive) {
+            item.setAttribute("aria-current", "page");
+          } else {
+            item.removeAttribute("aria-current");
+          }
+        });
+      };
 
       const lockPageScroll = () => {
         lockedScrollY = window.scrollY;
@@ -310,6 +325,49 @@
           unlockPageScroll();
         });
       });
+
+      const updateActiveNavigation = () => {
+        const headerHeight = siteHeader.getBoundingClientRect().height;
+        const probeY = headerHeight + (window.innerHeight - headerHeight) * 0.35;
+        const currentSection =
+          trackedSections.find((section) => {
+            const rect = section.getBoundingClientRect();
+            return rect.top <= probeY && rect.bottom > probeY;
+          }) ||
+          trackedSections.reduce((closestSection, section) => {
+            const sectionDistance = Math.abs(section.getBoundingClientRect().top - probeY);
+            const closestDistance = closestSection
+              ? Math.abs(closestSection.getBoundingClientRect().top - probeY)
+              : Infinity;
+            return sectionDistance < closestDistance ? section : closestSection;
+          }, null);
+
+        if (currentSection) {
+          setActiveNavigation(currentSection.id);
+        } else {
+          navItems.forEach((item) => item.removeAttribute("aria-current"));
+        }
+      };
+
+      let scrollTicking = false;
+      window.addEventListener("scroll", () => {
+        if (!scrollTicking) {
+          window.requestAnimationFrame(() => {
+            updateActiveNavigation();
+            scrollTicking = false;
+          });
+          scrollTicking = true;
+        }
+      });
+
+      window.addEventListener("resize", updateActiveNavigation);
+
+      const currentHash = window.location.hash.replace("#", "");
+      if (trackedSections.some((section) => section.id === currentHash)) {
+        setActiveNavigation(currentHash);
+      } else {
+        updateActiveNavigation();
+      }
     </script>
   </body>
 </html>
